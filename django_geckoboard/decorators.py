@@ -54,6 +54,26 @@ class WidgetDecorator(object):
 widget = WidgetDecorator()
 
 
+class MapWidgetDecorator(WidgetDecorator):
+    """
+    Geckoboard Map widget decorator.
+
+    Only works for IP address right now.  Expects a list of IP addresses this:
+    [u'63.119.32.2',]
+
+
+    This is is a WIP.  I will made this more generic soon.
+
+    """
+
+    def _convert_view_result(self, result):
+        if not isinstance(result, (tuple, list)):
+            result = [result]
+        return {'points': {'point': [{'ip': v} for v in result if v is not None]}}
+
+map_widget = MapWidgetDecorator()
+
+
 class NumberWidgetDecorator(WidgetDecorator):
     """
     Geckoboard Number widget decorator.
