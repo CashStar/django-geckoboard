@@ -58,18 +58,45 @@ class MapWidgetDecorator(WidgetDecorator):
     """
     Geckoboard Map widget decorator.
 
-    Only works for IP address right now.  Expects a list of IP addresses this:
-    [u'63.119.32.2',]
+    The decorated view must return a dictionary of lists with the following keys and structure
+
+    ip_list = ['111,222,333,444',]
+    city_list = [('Seattle', 'KC', 'US'),]
+    latlong_list = [('35.7736', '-45.8844',]
+    host_list = ['www.cashstar.com',]
 
 
-    This is is a WIP.  I will made this more generic soon.
+    This is still a WIP.  Needs to be more generic.
 
     """
 
     def _convert_view_result(self, result):
-        if not isinstance(result, (tuple, list)):
-            result = [result]
-        return {'points': {'point': [{'ip': v} for v in result if v is not None]}}
+        data = []
+        current_list = []
+        for key, value_list in result.iteritems():
+
+            if not isinstance(value_list, (tuple, list)):
+                value_list = [value_list]
+
+            if key == 'ip_list':
+                current_list = [{'ip': v} for v in value_list if v is not None]
+            elif key == 'city_list':
+                for locale in value_list:
+                    if len(locale) == 2:
+                        current_list.append({'city': {'city_name': u, 'country_code': v} for u, v in (locale,) if v is not None})
+                    else:
+                        current_list.append({'city': {'city_name': t, 'region_code': u, 'country_code': v} for t, u, v in (locale,) if v is not None})
+            elif key == 'latlong_list':
+                current_list = [{'latitude': u, 'longitude': v} for u, v in value_list if v is not None]
+            elif key == 'host_list':
+                current_list = [{'host': v} for v in value_list if v is not None]
+
+            import pdb
+            pdb.set_trace()
+            data = data + current_list
+
+        return {'points': {'point': data}}
+
 
 map_widget = MapWidgetDecorator()
 
