@@ -91,8 +91,6 @@ class MapWidgetDecorator(WidgetDecorator):
             elif key == 'host_list':
                 current_list = [{'host': v} for v in value_list if v is not None]
 
-            import pdb
-            pdb.set_trace()
             data = data + current_list
 
         return {'points': {'point': data}}
