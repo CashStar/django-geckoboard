@@ -85,9 +85,9 @@ class MapWidgetDecorator(WidgetDecorator):
             elif key == 'city_list':
                 for locale in value_list:
                     if len(locale) == 2:
-                        current_data.append({'city': {'city_name': u, 'country_code': v} for u, v in (locale,) if v is not None})
+                        current_data.append({'city': {'city_name': locale[0], 'country_code': locale[1]}})
                     else:
-                        current_data.append({'city': {'city_name': t, 'region_code': u, 'country_code': v} for t, u, v in (locale,) if v is not None})
+                        current_data.append({'city': {'city_name': locale[0], 'region_code':  locale[1], 'country_code':  locale[2]}})
             elif key == 'latlong_list':
                 current_data = [{'latitude': u, 'longitude': v} for u, v in value_list if v is not None]
             elif key == 'host_list':
