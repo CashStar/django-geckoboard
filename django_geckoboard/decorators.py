@@ -73,6 +73,10 @@ class MapWidgetDecorator(WidgetDecorator):
     def _convert_view_result(self, result):
         data = []
         current_list = []
+
+        color = result.get('color', None)
+        size = result.get('size', None)
+
         for key, value_list in result.iteritems():
 
             if not isinstance(value_list, (tuple, list)):
@@ -92,6 +96,12 @@ class MapWidgetDecorator(WidgetDecorator):
                 current_list = [{'host': v} for v in value_list if v is not None]
 
             data = data + current_list
+
+        for d in data:
+            if color:
+                d['color'] = color
+            if size:
+                d['size'] = size
 
         return {'points': {'point': data}}
 
