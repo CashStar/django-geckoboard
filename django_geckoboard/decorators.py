@@ -58,9 +58,9 @@ class MapWidgetDecorator(WidgetDecorator):
     """
     Geckoboard Map widget decorator.
 
-    The decorated view must return a dictionary of lists with the following keys and structure
+    The decorated view must return a list of dictionaries containing the following required and optoinal fields
 
-    ip_list = ['111,222,333,444',]
+    ////ip_list = ['111,222,333,444',]
     city_list = [('Seattle', 'KC', 'US'),]
     latlong_list = [('35.7736', '-45.8844',]
     host_list = ['www.cashstar.com',]
@@ -71,39 +71,40 @@ class MapWidgetDecorator(WidgetDecorator):
     """
 
     def _convert_view_result(self, result):
-        data = []
-        current_list = []
-
-        color = result.get('color', None)
-        size = result.get('size', None)
-
-        for key, value_list in result.iteritems():
+        combined_data = []
+        for data_set in result:
+            current_data = []
+            key = data_set['type']
+            value_list = data_set['data']
 
             if not isinstance(value_list, (tuple, list)):
                 value_list = [value_list]
 
             if key == 'ip_list':
-                current_list = [{'ip': v} for v in value_list if v is not None]
+                current_data = [{'ip': v} for v in value_list if v is not None]
             elif key == 'city_list':
                 for locale in value_list:
                     if len(locale) == 2:
-                        current_list.append({'city': {'city_name': u, 'country_code': v} for u, v in (locale,) if v is not None})
+                        current_data.append({'city': {'city_name': u, 'country_code': v} for u, v in (locale,) if v is not None})
                     else:
-                        current_list.append({'city': {'city_name': t, 'region_code': u, 'country_code': v} for t, u, v in (locale,) if v is not None})
+                        current_data.append({'city': {'city_name': t, 'region_code': u, 'country_code': v} for t, u, v in (locale,) if v is not None})
             elif key == 'latlong_list':
-                current_list = [{'latitude': u, 'longitude': v} for u, v in value_list if v is not None]
+                current_data = [{'latitude': u, 'longitude': v} for u, v in value_list if v is not None]
             elif key == 'host_list':
-                current_list = [{'host': v} for v in value_list if v is not None]
+                current_data = [{'host': v} for v in value_list if v is not None]
 
-            data = data + current_list
+            color = data_set.get('color', None)
+            size = data_set.get('size', None)
 
-        for d in data:
-            if color:
-                d['color'] = color
-            if size:
-                d['size'] = size
+            for point in current_data:
+                if color:
+                    point['color'] = color
+                if size:
+                    point['size'] = size
 
-        return {'points': {'point': data}}
+            combined_data = combined_data + current_data
+
+        return {'points': {'point': combined_data}}
 
 
 map_widget = MapWidgetDecorator()
