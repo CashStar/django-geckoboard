@@ -16,7 +16,11 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.datastructures import SortedDict
 from django.utils.decorators import available_attrs
-from django.utils import simplejson
+
+try:
+    from django.utils import simplejson as json
+except ImportError:
+    import json
 
 
 TEXT_NONE = 0
@@ -479,7 +483,7 @@ def _render(request, data):
         return _render_xml(data)
 
 def _render_json(data):
-    return simplejson.dumps(data)
+    return json.dumps(data)
 
 def _render_xml(data):
     doc = Document()
